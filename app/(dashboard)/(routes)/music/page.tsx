@@ -14,9 +14,11 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { Empty } from "@/components/empty";
 import { Loader } from "@/components/loader";
+import { useProModal } from "@/hooks/use-pro-modal";
 
 const MusicPage = () => {
   const [music, setMusic] = useState<string>();
+  const proModal = useProModal();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -35,8 +37,10 @@ const MusicPage = () => {
       setMusic(response.data.audio);
 
       form.reset();
-    } catch (error) {
-      //Todo: open pro model!
+    } catch (error: any) {
+      if (error?.response?.status === 403) {
+        proModal.onOpen();
+      }
       console.log(error);
     } finally {
       router.refresh();
